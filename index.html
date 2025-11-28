@@ -9,7 +9,7 @@
 <body>
     <div class="game-wrapper">
         <header class="header">
-            <h1>Tic-Tac-Toe - AI Challenge</h1>
+            <h1>Tic-Tac-Toe Challenge</h1>
             <div class="controls-row">
                 <label for="difficulty">Difficulty:</label>
                 <select id="difficulty">
@@ -17,6 +17,14 @@
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
                     <option value="impossible">Impossible</option>
+                </select>
+            </div>
+            <div class="controls-row">
+                <label for="board-size">Board:</label>
+                <select id="board-size">
+                    <option value="3" selected>3 x 3</option>
+                    <option value="5">5 x 5</option>
+                    <option value="dynamic">Dynamic</option>
                 </select>
             </div>
         </header>
@@ -29,21 +37,18 @@
 
         <p id="status" class="status">Your turn (X)</p>
 
-        <div class="board" id="board">
-            <button class="cell" data-index="0"></button>
-            <button class="cell" data-index="1"></button>
-            <button class="cell" data-index="2"></button>
-            <button class="cell" data-index="3"></button>
-            <button class="cell" data-index="4"></button>
-            <button class="cell" data-index="5"></button>
-            <button class="cell" data-index="6"></button>
-            <button class="cell" data-index="7"></button>
-            <button class="cell" data-index="8"></button>
+        <div class="board" id="board"></div>
+
+        <div class="expand-controls" id="expand-controls">
+            <button class="expand-btn" data-dir="up">+ Row Up</button>
+            <button class="expand-btn" data-dir="down">+ Row Down</button>
+            <button class="expand-btn" data-dir="left">+ Col Left</button>
+            <button class="expand-btn" data-dir="right">+ Col Right</button>
         </div>
 
         <div class="action-buttons">
-            <button id="reset-game">Chơi lại</button>
-            <button id="reset-scores">Reset điểm</button>
+            <button id="reset-game">Choi lai</button>
+            <button id="reset-scores">Reset</button>
         </div>
     </div>
 
