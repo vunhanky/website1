@@ -3,14 +3,40 @@ const statusText = document.getElementById('status');
 const difficultySelect = document.getElementById('difficulty');
 const boardSizeSelect = document.getElementById('board-size');
 const expandControls = document.getElementById('expand-controls');
+const zoomControls = document.getElementById('zoom-controls');
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
 const playerScoreEl = document.getElementById('player-score');
 const aiScoreEl = document.getElementById('ai-score');
 const drawScoreEl = document.getElementById('draw-score');
 const resetGameBtn = document.getElementById('reset-game');
-const resetScoresBtn = document.getElementById('reset-scores');
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+const loginUsernameInput = document.getElementById('login-username');
+const loginPasswordInput = document.getElementById('login-password');
+const registerUsernameInput = document.getElementById('register-username');
+const registerPasswordInput = document.getElementById('register-password');
+const sessionStatusEl = document.getElementById('session-status');
+const sessionUsernameEl = document.getElementById('session-username');
+const sessionNoteEl = document.getElementById('session-note');
+const logoutBtn = document.getElementById('logout-btn');
+const statWinEl = document.getElementById('stat-win');
+const statLossEl = document.getElementById('stat-loss');
+const statDrawEl = document.getElementById('stat-draw');
+const leaderboardBody = document.getElementById('leaderboard-body');
+
+const STORAGE_KEYS = {
+    users: 'tttUsers',
+    session: 'tttSessionUser'
+};
+
+const DYNAMIC_BASE_SIZE = 3;
+const DYNAMIC_INITIAL_LAYERS = 1;
+const DYNAMIC_START_SIZE = DYNAMIC_BASE_SIZE + DYNAMIC_INITIAL_LAYERS * 2;
+const DYNAMIC_WIN_LENGTH = 5;
 
 let mode = boardSizeSelect.value === 'dynamic' ? 'dynamic' : 'static';
-let boardRows = mode === 'dynamic' ? 3 : Number(boardSizeSelect.value) || 3;
+let boardRows = mode === 'dynamic' ? DYNAMIC_START_SIZE : Number(boardSizeSelect.value) || DYNAMIC_BASE_SIZE;
 let boardCols = boardRows;
 let winLength = getWinLength();
 let board = createEmptyBoard(boardRows, boardCols);
@@ -20,17 +46,24 @@ let currentPlayer = 'X';
 const scores = { player: 0, ai: 0, draw: 0 };
 let currentDifficulty = difficultySelect.value || 'easy';
 let cells = [];
+let hiddenLayers = 0;
+let users = loadUsers();
+let currentUser = null;
 
 initGame();
 
 function initGame() {
     renderBoard();
+    restoreSession();
     resetGame();
 
     difficultySelect.addEventListener('change', handleDifficultyChange);
     boardSizeSelect.addEventListener('change', handleBoardSizeChange);
-    resetGameBtn.addEventListener('click', () => resetGame());
-    resetScoresBtn.addEventListener('click', resetScores);
+    resetGameBtn.addEventListener('click', () => resetGame({ resetDynamic: mode === 'dynamic', redraw: true }));
+    attachAuthHandlers();
+
+    zoomInBtn.addEventListener('click', () => adjustZoom(1));
+    zoomOutBtn.addEventListener('click', () => adjustZoom(-1));
 
     expandControls.querySelectorAll('.expand-btn').forEach(btn => {
         btn.addEventListener('click', () => expandBoard(btn.dataset.dir));
@@ -38,7 +71,8 @@ function initGame() {
 
     toggleExpandControls();
     updateScoreboard();
-    updateStatus('Luot cua ban (X)');
+    refreshLeaderboard();
+    updateStatus('Lượt của bạn (X)');
 }
 
 function createEmptyBoard(rows, cols) {
@@ -46,22 +80,33 @@ function createEmptyBoard(rows, cols) {
 }
 
 function getWinLength() {
-    return mode === 'dynamic' ? 3 : boardRows;
+    return mode === 'dynamic' ? DYNAMIC_WIN_LENGTH : boardRows;
 }
 
 function renderBoard() {
     boardElement.innerHTML = '';
-    boardElement.style.gridTemplateColumns = `repeat(${boardCols}, 1fr)`;
+    const { offset, visibleRows, visibleCols } = getVisibleBounds();
+    boardElement.style.gridTemplateColumns = `repeat(${visibleCols}, 1fr)`;
 
     cells = [];
-    for (let i = 0; i < board.length; i += 1) {
-        const cell = document.createElement('button');
-        cell.className = 'cell';
-        cell.dataset.index = i;
-        cell.addEventListener('click', handleCellClick);
-        boardElement.appendChild(cell);
-        cells.push(cell);
+    for (let r = 0; r < visibleRows; r += 1) {
+        for (let c = 0; c < visibleCols; c += 1) {
+            const realRow = r + offset;
+            const realCol = c + offset;
+            const realIndex = coordToIndex(realRow, realCol);
+            const cell = document.createElement('button');
+            cell.className = 'cell';
+            if (mode === 'dynamic' && isVisibleOuterRingIndex(realIndex, visibleRows, visibleCols, offset)) {
+                cell.classList.add('outer-ring');
+            }
+            cell.dataset.index = realIndex;
+            cell.addEventListener('click', handleCellClick);
+            boardElement.appendChild(cell);
+            cells[realIndex] = cell;
+        }
     }
+
+    updateZoomControls();
 }
 
 function repaintBoardFromState() {
@@ -72,6 +117,16 @@ function repaintBoardFromState() {
     });
 }
 
+function revealIndex(index) {
+    const { row, col } = indexToCoord(index);
+    const distToEdge = Math.min(row, col, boardRows - 1 - row, boardCols - 1 - col);
+    if (hiddenLayers > distToEdge) {
+        hiddenLayers = distToEdge;
+        renderBoard();
+        repaintBoardFromState();
+    }
+}
+
 function handleCellClick(event) {
     const index = Number(event.currentTarget.dataset.index);
 
@@ -79,7 +134,17 @@ function handleCellClick(event) {
         return;
     }
 
+    if (mode === 'dynamic' && !isIndexVisible(index)) {
+        return;
+    }
+
+    const shouldExpand = mode === 'dynamic' && isVisibleOuterRingIndex(index);
+
     makeMove(index, 'X');
+
+    if (shouldExpand) {
+        expandBoard('ring');
+    }
 
     const result = checkWinner(board);
     if (result.winner) {
@@ -93,9 +158,9 @@ function handleCellClick(event) {
     }
 
     currentPlayer = 'O';
-    updateStatus('May dang suy nghi...');
+    updateStatus('Máy đang suy nghĩ...');
 
-    setTimeout(aiMove, 450);
+    setTimeout(aiMove, 750);
 }
 
 function makeMove(index, player) {
@@ -134,17 +199,22 @@ function endGame(winner, combo = []) {
 
     if (winner === 'X') {
         scores.player += 1;
-        updateStatus('Ban thang!');
+        updateStatus('Bạn thắng!');
     } else if (winner === 'O') {
         scores.ai += 1;
-        updateStatus('May thang!');
+        updateStatus('Máy thắng!');
     } else {
         scores.draw += 1;
-        updateStatus('Hoa!');
+        updateStatus('Hòa!');
     }
 
     highlightWinners(combo);
     updateScoreboard();
+    persistScoresForUser();
+
+    if (mode === 'dynamic') {
+        setTimeout(() => resetGame({ redraw: true, resetDynamic: true }), 650);
+    }
 }
 
 function highlightWinners(combo) {
@@ -157,7 +227,8 @@ function highlightWinners(combo) {
 function aiMove() {
     if (!isGameActive) return;
 
-    const availableCells = getAvailableCells(board);
+    const useVisibleOnly = mode === 'dynamic' && currentDifficulty !== 'impossible';
+    const availableCells = getAvailableCells(board, { visibleOnly: useVisibleOnly });
     if (availableCells.length === 0) return;
 
     let aiIndex;
@@ -167,19 +238,28 @@ function aiMove() {
             aiIndex = getEasyMove(availableCells);
             break;
         case 'medium':
-            aiIndex = getMediumMove();
+            aiIndex = getMediumMove(availableCells);
             break;
         case 'hard':
-            aiIndex = getHardMove();
+            aiIndex = getHardMove(availableCells, { respectVisibility: useVisibleOnly });
             break;
         case 'impossible':
-            aiIndex = getBestMoveMinimax();
+            aiIndex = getBestMoveMinimax({ respectVisibility: useVisibleOnly });
             break;
         default:
             aiIndex = getEasyMove(availableCells);
     }
 
+    if (mode === 'dynamic' && !isIndexVisible(aiIndex)) {
+        revealIndex(aiIndex);
+    }
+
+    const shouldExpand = mode === 'dynamic' && isVisibleOuterRingIndex(aiIndex);
     makeMove(aiIndex, 'O');
+
+    if (shouldExpand) {
+        expandBoard('ring');
+    }
 
     const result = checkWinner(board);
     if (result.winner) {
@@ -193,11 +273,20 @@ function aiMove() {
     }
 
     currentPlayer = 'X';
-    updateStatus('Luot cua ban (X)');
+    updateStatus('Lượt của bạn (X)');
 }
 
-function getAvailableCells(boardToCheck) {
+function getAvailableCells(boardToCheck, options = {}) {
+    const { visibleOnly = false } = options;
     const indices = [];
+
+    if (visibleOnly && mode === 'dynamic') {
+        for (const index of getVisibleIndices()) {
+            if (!boardToCheck[index]) indices.push(index);
+        }
+        return indices;
+    }
+
     boardToCheck.forEach((cell, index) => {
         if (!cell) indices.push(index);
     });
@@ -209,9 +298,13 @@ function getEasyMove(availableCells) {
     return availableCells[randomIndex];
 }
 
-function getCriticalMoveFor(player) {
+function getCriticalMoveFor(player, options = {}) {
+    const { respectVisibility = true } = options;
     for (const combo of winningCombos) {
-        const empties = combo.filter(i => !board[i]);
+        const empties = combo.filter(i => {
+            if (board[i]) return false;
+            return respectVisibility ? isIndexVisible(i) : true;
+        });
         const playerCount = combo.filter(i => board[i] === player).length;
 
         if (playerCount === winLength - 1 && empties.length === 1) {
@@ -221,45 +314,74 @@ function getCriticalMoveFor(player) {
     return null;
 }
 
-function getMediumMove() {
-    const blockMove = getCriticalMoveFor('X');
+function getMediumMove(
+    availableCells = getAvailableCells(board, { visibleOnly: mode === 'dynamic' }),
+    options = {}
+) {
+    const { respectVisibility = true } = options;
+    const blockMove = getCriticalMoveFor('X', { respectVisibility });
     if (blockMove !== null) return blockMove;
 
-    return getEasyMove(getAvailableCells(board));
+    return getEasyMove(availableCells);
 }
 
-function getHardMove() {
-    const winMove = getCriticalMoveFor('O');
+function getHardMove(
+    availableCells = getAvailableCells(board, { visibleOnly: mode === 'dynamic' }),
+    options = {}
+) {
+    const { respectVisibility = true } = options;
+
+    const winMove = getCriticalMoveFor('O', { respectVisibility });
     if (winMove !== null) return winMove;
 
-    const blockMove = getCriticalMoveFor('X');
+    const blockMove = getCriticalMoveFor('X', { respectVisibility });
     if (blockMove !== null) return blockMove;
 
-    const centerRow = Math.floor(boardRows / 2);
-    const centerCol = Math.floor(boardCols / 2);
+    const { centerRow, centerCol } = getCenterCoords({ respectVisibility });
     const centerIndex = coordToIndex(centerRow, centerCol);
     if (!board[centerIndex]) return centerIndex;
 
-    const corners = getCornerIndices().filter(i => !board[i]);
+    const corners = getCornerIndices({ respectVisibility }).filter(i => !board[i]);
     if (corners.length) return getEasyMove(corners);
 
-    return getEasyMove(getAvailableCells(board));
+    return getEasyMove(availableCells);
 }
 
-function getCornerIndices() {
-    const lastRow = boardRows - 1;
-    const lastCol = boardCols - 1;
+function getCornerIndices(options = {}) {
+    const { respectVisibility = true } = options;
+    const { offset, visibleRows, visibleCols } = respectVisibility
+        ? getVisibleBounds()
+        : { offset: 0, visibleRows: boardRows, visibleCols: boardCols };
+
+    const firstRow = offset;
+    const firstCol = offset;
+    const lastRow = offset + visibleRows - 1;
+    const lastCol = offset + visibleCols - 1;
     return [
-        coordToIndex(0, 0),
-        coordToIndex(0, lastCol),
-        coordToIndex(lastRow, 0),
+        coordToIndex(firstRow, firstCol),
+        coordToIndex(firstRow, lastCol),
+        coordToIndex(lastRow, firstCol),
         coordToIndex(lastRow, lastCol)
     ];
 }
 
-function getBestMoveMinimax() {
+function getCenterCoords(options = {}) {
+    const { respectVisibility = true } = options;
+    const bounds = respectVisibility
+        ? getVisibleBounds()
+        : { offset: 0, visibleRows: boardRows, visibleCols: boardCols };
+    const centerRow = bounds.offset + Math.floor(bounds.visibleRows / 2);
+    const centerCol = bounds.offset + Math.floor(bounds.visibleCols / 2);
+    return { centerRow, centerCol };
+}
+
+function getBestMoveMinimax(options = {}) {
+    const { respectVisibility = true } = options;
     if (boardRows !== 3 || boardCols !== 3 || winLength !== 3) {
-        return getHardMove();
+        return getHardMove(
+            getAvailableCells(board, { visibleOnly: respectVisibility && mode === 'dynamic' }),
+            { respectVisibility }
+        );
     }
 
     let bestScore = -Infinity;
@@ -314,16 +436,231 @@ function updateScoreboard() {
     playerScoreEl.textContent = scores.player;
     aiScoreEl.textContent = scores.ai;
     drawScoreEl.textContent = scores.draw;
+    updateSessionStats();
+}
+
+function updateSessionStats() {
+    if (!statWinEl || !statLossEl || !statDrawEl) return;
+    statWinEl.textContent = scores.player;
+    statLossEl.textContent = scores.ai;
+    statDrawEl.textContent = scores.draw;
+}
+
+function attachAuthHandlers() {
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+    if (registerForm) registerForm.addEventListener('submit', handleRegister);
+    if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
+}
+
+function handleRegister(event) {
+    event.preventDefault();
+    if (!registerUsernameInput || !registerPasswordInput) return;
+
+    const username = registerUsernameInput.value.trim();
+    const password = registerPasswordInput.value.trim();
+
+    if (!username || !password) {
+        updateSessionUI('Điền đủ tên và mật khẩu để đăng ký.');
+        return;
+    }
+
+    const exists = users.some(user => user.username.toLowerCase() === username.toLowerCase());
+    if (exists) {
+        updateSessionUI('Tên người chơi đã tồn tại, hãy chọn tên khác.');
+        return;
+    }
+
+    const newUser = {
+        username,
+        password,
+        scores: getEmptyScores()
+    };
+
+    users.push(newUser);
+    saveUsers();
+    registerForm.reset();
+    setCurrentUser(username);
+    updateSessionUI('Tạo tài khoản thành công, bắt đầu chơi thôi!');
+    refreshLeaderboard();
+}
+
+function handleLogin(event) {
+    event.preventDefault();
+    if (!loginUsernameInput || !loginPasswordInput) return;
+
+    const username = loginUsernameInput.value.trim();
+    const password = loginPasswordInput.value.trim();
+
+    if (!username || !password) {
+        updateSessionUI('Nhập đủ tên và mật khẩu để đăng nhập.');
+        return;
+    }
+
+    const user = users.find(
+        entry => entry.username.toLowerCase() === username.toLowerCase() && entry.password === password
+    );
+
+    if (!user) {
+        updateSessionUI('Sai tên hoặc mật khẩu.');
+        return;
+    }
+
+    setCurrentUser(user.username);
+    loginForm.reset();
+    updateSessionUI('Đăng nhập thành công. Điểm sẽ được lưu tự động.');
+    refreshLeaderboard();
+}
+
+function logoutUser() {
+    setCurrentUser(null);
+    updateSessionUI('Đã đăng xuất, tiếp tục chơi ở chế độ khách.');
+    resetGame({ resetDynamic: mode === 'dynamic', redraw: true });
+}
+
+function restoreSession() {
+    const savedUsername = localStorage.getItem(STORAGE_KEYS.session);
+    if (savedUsername && users.some(user => user.username === savedUsername)) {
+        setCurrentUser(savedUsername);
+    } else {
+        setCurrentUser(null);
+    }
+}
+
+function setCurrentUser(username) {
+    currentUser = users.find(user => user.username === username) || null;
+
+    if (currentUser) {
+        Object.assign(scores, normalizeScores(currentUser.scores));
+        localStorage.setItem(STORAGE_KEYS.session, currentUser.username);
+    } else {
+        Object.assign(scores, getEmptyScores());
+        localStorage.removeItem(STORAGE_KEYS.session);
+    }
+
+    updateScoreboard();
+    updateSessionUI();
+    refreshLeaderboard();
+}
+
+function persistScoresForUser() {
+    if (!currentUser) return;
+    currentUser.scores = { ...scores, updatedAt: Date.now() };
+    saveUsers();
+    refreshLeaderboard();
+}
+
+function updateSessionUI(message = '') {
+    if (sessionStatusEl) {
+        sessionStatusEl.textContent = currentUser
+            ? `Xin chào, ${currentUser.username}`
+            : 'Đang ở chế độ khách';
+    }
+
+    if (sessionUsernameEl) {
+        sessionUsernameEl.textContent = currentUser ? currentUser.username : '-';
+    }
+
+    if (logoutBtn) {
+        logoutBtn.disabled = !currentUser;
+    }
+
+    if (sessionNoteEl) {
+        sessionNoteEl.textContent = message || (currentUser
+            ? 'Điểm được lưu tự động sau mỗi ván.'
+            : 'Đăng nhập để lưu điểm và xếp hạng.');
+    }
+
+    updateSessionStats();
+}
+
+function refreshLeaderboard() {
+    if (!leaderboardBody) return;
+
+    leaderboardBody.innerHTML = '';
+    if (!users.length) {
+        const emptyRow = document.createElement('div');
+        emptyRow.className = 'leaderboard-row empty';
+        emptyRow.innerHTML = '<span>-</span><span>Chưa có người chơi</span><span>0</span><span>0</span><span>0</span><span>0</span>';
+        leaderboardBody.appendChild(emptyRow);
+        return;
+    }
+
+    const sorted = [...users].sort(sortUsersByScore);
+    sorted.forEach((user, index) => {
+        const stats = normalizeScores(user.scores);
+        const total = stats.player + stats.ai + stats.draw;
+        const row = document.createElement('div');
+        row.className = 'leaderboard-row';
+        const marker = currentUser && currentUser.username === user.username ? ' (bạn)' : '';
+        row.innerHTML = `
+            <span>${index + 1}</span>
+            <span>${user.username}${marker}</span>
+            <span>${stats.player}</span>
+            <span>${stats.draw}</span>
+            <span>${stats.ai}</span>
+            <span>${total}</span>
+        `;
+        leaderboardBody.appendChild(row);
+    });
+}
+
+function sortUsersByScore(a, b) {
+    const scoreA = normalizeScores(a.scores);
+    const scoreB = normalizeScores(b.scores);
+
+    if (scoreA.player !== scoreB.player) return scoreB.player - scoreA.player;
+    if (scoreA.draw !== scoreB.draw) return scoreB.draw - scoreA.draw;
+    if (scoreA.ai !== scoreB.ai) return scoreA.ai - scoreB.ai;
+    return (scoreB.updatedAt || 0) - (scoreA.updatedAt || 0);
+}
+
+function normalizeScores(scoreObj = {}) {
+    return {
+        player: Number(scoreObj.player) || 0,
+        ai: Number(scoreObj.ai) || 0,
+        draw: Number(scoreObj.draw) || 0,
+        updatedAt: scoreObj.updatedAt || Date.now()
+    };
+}
+
+function getEmptyScores() {
+    return { player: 0, ai: 0, draw: 0, updatedAt: Date.now() };
+}
+
+function loadUsers() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEYS.users);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(user => ({
+            ...user,
+            scores: normalizeScores(user.scores)
+        }));
+    } catch (error) {
+        console.warn('Không thể đọc danh sách người chơi', error);
+        return [];
+    }
+}
+
+function saveUsers() {
+    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
 }
 
 function resetGame(options = {}) {
-    const shouldRedraw = options.redraw || false;
+    const shouldRedraw = options.redraw || options.resetDynamic || false;
+    const resetDynamic = options.resetDynamic || false;
+
+    if (resetDynamic && mode === 'dynamic') {
+        resetDynamicBoard();
+    }
+
     board = createEmptyBoard(boardRows, boardCols);
     isGameActive = true;
     currentPlayer = 'X';
     winLength = getWinLength();
     winningCombos = buildWinningCombos(boardRows, boardCols, winLength);
-    updateStatus('Luot cua ban (X)');
+    updateStatus('Lượt của bạn (X)');
 
     if (shouldRedraw) {
         renderBoard();
@@ -333,14 +670,14 @@ function resetGame(options = {}) {
         cell.innerHTML = '';
         cell.classList.remove('filled', 'winner', 'filled-x', 'filled-o');
     });
+
+    updateZoomControls();
 }
 
-function resetScores() {
-    scores.player = 0;
-    scores.ai = 0;
-    scores.draw = 0;
-    updateScoreboard();
-    resetGame();
+function resetDynamicBoard() {
+    hiddenLayers = 0;
+    boardRows = DYNAMIC_START_SIZE;
+    boardCols = DYNAMIC_START_SIZE;
 }
 
 function handleDifficultyChange(event) {
@@ -353,21 +690,66 @@ function handleBoardSizeChange(event) {
     mode = value === 'dynamic' ? 'dynamic' : 'static';
 
     if (mode === 'dynamic') {
-        boardRows = 3;
-        boardCols = 3;
+        boardRows = DYNAMIC_START_SIZE;
+        boardCols = DYNAMIC_START_SIZE;
+        hiddenLayers = 0;
     } else {
-        boardRows = Number(value) || 3;
+        boardRows = Number(value) || DYNAMIC_BASE_SIZE;
         boardCols = boardRows;
+        hiddenLayers = 0;
     }
 
     winLength = getWinLength();
     winningCombos = buildWinningCombos(boardRows, boardCols, winLength);
     toggleExpandControls();
+    updateZoomControls();
     resetGame({ redraw: true });
 }
 
 function toggleExpandControls() {
-    expandControls.style.display = mode === 'dynamic' ? 'grid' : 'none';
+    expandControls.style.display = 'none';
+}
+
+function canZoomIn() {
+    if (mode !== 'dynamic') return false;
+    return hiddenLayers < getMaxHiddenLayers();
+}
+
+function canZoomOut() {
+    if (mode !== 'dynamic') return false;
+    return hiddenLayers > 0;
+}
+
+function getMaxHiddenLayers() {
+    const smallestSide = Math.min(boardRows, boardCols);
+    return Math.max(0, Math.floor((smallestSide - winLength) / 2));
+}
+
+function updateZoomControls() {
+    if (!zoomControls) return;
+
+    if (mode !== 'dynamic') {
+        zoomControls.style.display = 'none';
+        return;
+    }
+
+    zoomControls.style.display = 'grid';
+    if (zoomInBtn) zoomInBtn.disabled = !canZoomIn();
+    if (zoomOutBtn) zoomOutBtn.disabled = !canZoomOut();
+}
+
+function adjustZoom(direction) {
+    if (mode !== 'dynamic') return;
+
+    const nextHidden = hiddenLayers + direction;
+    if (direction > 0 && !canZoomIn()) return;
+    if (direction < 0 && !canZoomOut()) return;
+    const maxHidden = getMaxHiddenLayers();
+    hiddenLayers = Math.min(Math.max(0, nextHidden), maxHidden);
+
+    renderBoard();
+    repaintBoardFromState();
+    updateZoomControls();
 }
 
 function expandBoard(direction) {
@@ -389,6 +771,12 @@ function expandBoard(direction) {
             addLeft = 1;
             break;
         case 'right':
+            addRight = 1;
+            break;
+        case 'ring':
+            addTop = 1;
+            addBottom = 1;
+            addLeft = 1;
             addRight = 1;
             break;
         default:
@@ -417,10 +805,66 @@ function expandBoard(direction) {
 
     winLength = getWinLength();
     winningCombos = buildWinningCombos(boardRows, boardCols, winLength);
+    updateZoomControls();
 }
 
 function coordToIndex(row, col) {
     return row * boardCols + col;
+}
+
+function indexToCoord(index, cols = boardCols) {
+    const row = Math.floor(index / cols);
+    const col = index % cols;
+    return { row, col };
+}
+
+function isOuterRingIndex(index, rows = boardRows, cols = boardCols) {
+    const { row, col } = indexToCoord(index, cols);
+    return row === 0 || col === 0 || row === rows - 1 || col === cols - 1;
+}
+
+function getVisibleBounds() {
+    const offset = hiddenLayers;
+    const visibleRows = boardRows - offset * 2;
+    const visibleCols = boardCols - offset * 2;
+    return { offset, visibleRows, visibleCols };
+}
+
+function isIndexVisible(index) {
+    const { offset, visibleRows, visibleCols } = getVisibleBounds();
+    const { row, col } = indexToCoord(index);
+    return (
+        row >= offset &&
+        col >= offset &&
+        row < offset + visibleRows &&
+        col < offset + visibleCols
+    );
+}
+
+function isVisibleOuterRingIndex(index, visibleRows, visibleCols, offset) {
+    const bounds = getVisibleBounds();
+    const effectiveOffset = offset !== undefined ? offset : bounds.offset;
+    const rows = visibleRows !== undefined ? visibleRows : bounds.visibleRows;
+    const cols = visibleCols !== undefined ? visibleCols : bounds.visibleCols;
+    const { row, col } = indexToCoord(index);
+    const top = effectiveOffset;
+    const left = effectiveOffset;
+    const bottom = effectiveOffset + rows - 1;
+    const right = effectiveOffset + cols - 1;
+    return row === top || row === bottom || col === left || col === right;
+}
+
+function getVisibleIndices() {
+    const { offset, visibleRows, visibleCols } = getVisibleBounds();
+    const indices = [];
+    for (let r = 0; r < visibleRows; r += 1) {
+        for (let c = 0; c < visibleCols; c += 1) {
+            const realRow = r + offset;
+            const realCol = c + offset;
+            indices.push(coordToIndex(realRow, realCol));
+        }
+    }
+    return indices;
 }
 
 function buildWinningCombos(rows, cols, length) {

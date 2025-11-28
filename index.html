@@ -7,50 +7,234 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-wrapper">
-        <header class="header">
-            <h1>Tic-Tac-Toe Challenge</h1>
-            <div class="controls-row">
-                <label for="difficulty">Difficulty:</label>
-                <select id="difficulty">
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                    <option value="impossible">Impossible</option>
-                </select>
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-mark">
+                <span class="mark mark-x">X</span>
+                <span class="mark mark-o">O</span>
             </div>
-            <div class="controls-row">
-                <label for="board-size">Board:</label>
-                <select id="board-size">
-                    <option value="3" selected>3 x 3</option>
-                    <option value="5">5 x 5</option>
-                    <option value="dynamic">Dynamic</option>
-                </select>
+            <div>
+                <p class="brand-kicker">AI Tic-Tac-Toe Lab</p>
+                <h1 class="site-title">Phòng thí nghiệm chiến thuật</h1>
             </div>
-        </header>
+        </div>
+        <nav class="site-nav">
+            <a href="#gioi-thieu">Giới thiệu</a>
+            <a href="#game">Game</a>
+            <a href="#tai-khoan">Tài khoản</a>
+            <a href="#leaderboard">Bảng xếp hạng</a>
+        </nav>
+    </header>
 
-        <section class="scoreboard">
-            <div class="score">You: <span id="player-score">0</span></div>
-            <div class="score">Machine: <span id="ai-score">0</span></div>
-            <div class="score">Draw: <span id="draw-score">0</span></div>
+    <main class="page">
+        <section class="hero" id="gioi-thieu">
+            <div class="hero-copy">
+                <p class="eyebrow">AI vs Player</p>
+                <h2>Chinh phục bàn cờ neon với AI linh hoạt</h2>
+                <p class="lede">
+                    Đổi kích thước bảng, zoom, mở rộng dòng/cột và lựa chọn 4 mức độ AI. Mỗi lần chơi đều có điểm số theo dõi trực tiếp.
+                </p>
+                <div class="hero-tags">
+                    <span class="tag-pill">4 cấp độ AI</span>
+                    <span class="tag-pill">Bảng 3x3, 5x5, Dynamic</span>
+                    <span class="tag-pill">Theo dõi điểm thắng/thua/hòa</span>
+                </div>
+                <div class="hero-actions">
+                    <a class="btn primary" href="#game">Chơi ngay</a>
+                    <a class="btn ghost" href="#meo">Mẹo và hướng dẫn</a>
+                </div>
+            </div>
+            <div class="hero-panel">
+                <div class="mini-card">
+                    <p class="label">Trải nghiệm</p>
+                    <strong>Hiệu ứng neon</strong>
+                    <small>Board tương tác với zoom, mở rộng linh hoạt.</small>
+                </div>
+                <div class="mini-card">
+                    <p class="label">Chiến thuật</p>
+                    <strong>AI Minimax</strong>
+                    <small>Chọn độ khó để tập luyện và thử thách bản thân.</small>
+                </div>
+            </div>
         </section>
 
-        <p id="status" class="status">Your turn (X)</p>
+        <section class="auth-section" id="tai-khoan">
+            <div class="auth-copy">
+                <p class="eyebrow">Tài khoản</p>
+                <h3>Lưu điểm theo tên bạn</h3>
+                <p class="lede">
+                    Đăng ký và đăng nhập để giữ điểm thắng/thua/hòa. Mỗi lần hoàn thành ván đấu đều được lưu lại và hiển thị trong bảng xếp hạng.
+                </p>
+                <div class="pill-note">Không có reset điểm - mỗi chiến thắng đều được ghi nhận.</div>
+            </div>
+            <div class="auth-forms">
+                <div class="auth-card">
+                    <h4>Đăng nhập</h4>
+                    <form id="login-form" class="form-grid">
+                        <label>
+                            <span>Tên người chơi</span>
+                            <input type="text" id="login-username" autocomplete="username">
+                        </label>
+                        <label>
+                            <span>Mật khẩu</span>
+                            <input type="password" id="login-password" autocomplete="current-password">
+                        </label>
+                        <button type="submit" class="btn primary">Đăng nhập</button>
+                    </form>
+                </div>
+                <div class="auth-card">
+                    <h4>Đăng ký</h4>
+                    <form id="register-form" class="form-grid">
+                        <label>
+                            <span>Tên người chơi</span>
+                            <input type="text" id="register-username" autocomplete="username">
+                        </label>
+                        <label>
+                            <span>Mật khẩu</span>
+                            <input type="password" id="register-password" autocomplete="new-password">
+                        </label>
+                        <button type="submit" class="btn ghost">Tạo tài khoản</button>
+                    </form>
+                </div>
+                <div class="auth-card full">
+                    <div class="session-row">
+                        <div>
+                            <p class="eyebrow">Trạng thái</p>
+                            <h4 id="session-status">Đang ở chế độ khách</h4>
+                            <p class="session-note" id="session-note">Đăng nhập để lưu điểm và xếp hạng.</p>
+                        </div>
+                        <div class="session-actions">
+                            <p class="pill-note subtle">Người chơi: <span id="session-username">-</span></p>
+                            <button id="logout-btn" type="button" class="btn danger" disabled>Đăng xuất</button>
+                        </div>
+                    </div>
+                    <div class="session-stats">
+                        <div class="stat-chip">Thắng: <span id="stat-win">0</span></div>
+                        <div class="stat-chip">Thua: <span id="stat-loss">0</span></div>
+                        <div class="stat-chip">Hòa: <span id="stat-draw">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <div class="board" id="board"></div>
+        <section class="game-section" id="game">
+            <div class="game-wrapper">
+                <header class="header">
+                    <h2>Tic-Tac-Toe Challenge</h2>
+                    <div class="controls-row">
+                        <label for="difficulty">Difficulty:</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                            <option value="impossible">Impossible</option>
+                        </select>
+                    </div>
+                    <div class="controls-row">
+                        <label for="board-size">Board:</label>
+                        <select id="board-size">
+                            <option value="3" selected>3 x 3</option>
+                            <option value="5">5 x 5</option>
+                            <option value="dynamic">Dynamic</option>
+                        </select>
+                    </div>
+                </header>
 
-        <div class="expand-controls" id="expand-controls">
-            <button class="expand-btn" data-dir="up">+ Row Up</button>
-            <button class="expand-btn" data-dir="down">+ Row Down</button>
-            <button class="expand-btn" data-dir="left">+ Col Left</button>
-            <button class="expand-btn" data-dir="right">+ Col Right</button>
+                <section class="scoreboard">
+                    <div class="score">Bạn: <span id="player-score">0</span></div>
+                    <div class="score">Máy: <span id="ai-score">0</span></div>
+                    <div class="score">Hòa: <span id="draw-score">0</span></div>
+                </section>
+
+                <p id="status" class="status">Lượt của bạn (X)</p>
+
+                <div class="board" id="board"></div>
+
+                <div class="zoom-controls" id="zoom-controls">
+                    <button class="zoom-btn" id="zoom-in">Zoom +</button>
+                    <button class="zoom-btn" id="zoom-out">Zoom -</button>
+                </div>
+
+                <div class="expand-controls" id="expand-controls">
+                    <button class="expand-btn" data-dir="up">+ Row Up</button>
+                    <button class="expand-btn" data-dir="down">+ Row Down</button>
+                    <button class="expand-btn" data-dir="left">+ Col Left</button>
+                    <button class="expand-btn" data-dir="right">+ Col Right</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="reset-game">Chơi lại</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-grid" id="meo">
+            <div class="info-card">
+                <p class="eyebrow">Cách chơi</p>
+                <h3>Bắt đầu nhanh</h3>
+                <ul>
+                    <li>Chọn độ khó và kích thước bảng trước khi bắt đầu.</li>
+                    <li>Bạn là X, AI là O. Lượt đánh luân phiên.</li>
+                    <li>Xem điểm số cập nhật real-time ở phần Scoreboard.</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <p class="eyebrow">Bảng động</p>
+                <h3>Tùy biến không giới hạn</h3>
+                <ul>
+                    <li>Chế độ Dynamic cho phép thêm dòng/cột bất kỳ lúc nào.</li>
+                    <li>Sử dụng nút Zoom để nhìn rõ các ô ở bảng lớn.</li>
+                    <li>Chỉ có nút Chơi lại, điểm được lưu theo tài khoản.</li>
+                </ul>
+            </div>
+            <div class="info-card highlight">
+                <p class="eyebrow">Mẹo thắng</p>
+                <h3>Giữ thế chủ động</h3>
+                <ul>
+                    <li>Luôn chiếm giữa bảng 3x3 nếu có thể.</li>
+                    <li>Chặn 2 nước AI liên tiếp trước khi tấn công.</li>
+                    <li>Thử mức độ Impossible để tập suy nghĩ 2-3 nước trước.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="leaderboard-section" id="leaderboard">
+            <div class="leaderboard-head">
+                <div>
+                    <p class="eyebrow">Bảng xếp hạng</p>
+                    <h3>Xếp hạng người chơi theo điểm thắng</h3>
+                    <p class="lede">Đăng nhập, chơi, và xem bạn ở đâu trên bảng. Điểm được lưu bằng local storage.</p>
+                </div>
+                <div class="pill-note subtle">Sắp xếp theo điểm thắng > hòa > thua từ thấp.</div>
+            </div>
+            <div class="leaderboard-card">
+                <div class="leaderboard-table">
+                    <div class="leaderboard-row header">
+                        <span>#</span>
+                        <span>Người chơi</span>
+                        <span>Thắng</span>
+                        <span>Hòa</span>
+                        <span>Thua</span>
+                        <span>Tổng</span>
+                    </div>
+                    <div id="leaderboard-body"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>
+            <strong>AI Tic-Tac-Toe</strong>
+            <p>Giao diện neon, AI nhiều cấp độ và bảng động để bạn thử thách bản thân.</p>
         </div>
-
-        <div class="action-buttons">
-            <button id="reset-game">Choi lai</button>
-            <button id="reset-scores">Reset</button>
+        <div class="footer-links">
+            <a href="#game">Chơi ngay</a>
+            <a href="#gioi-thieu">Giới thiệu</a>
+            <a href="#meo">Hướng dẫn</a>
+            <a href="#leaderboard">Bảng xếp hạng</a>
         </div>
-    </div>
+    </footer>
 
     <script src="script.js" defer></script>
 </body>
