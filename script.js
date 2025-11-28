@@ -61,7 +61,7 @@ function handleCellClick(event) {
 
     // Switch to AI turn
     currentPlayer = 'O';
-    updateStatus('AI is thinking...');
+    updateStatus('Machine is thinking...');
 
     // Small delay to make the AI feel more natural
     setTimeout(aiMove, 450);
