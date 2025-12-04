@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tic-Tac-Toe - Game</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-mark" style="padding: 0; background: none; box-shadow: none;">
+                <img src="icon.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
+            </div>
+            <div>
+                <p class="brand-kicker">AI Tic-Tac-Toe Lab</p>
+                <h1 class="site-title">Phòng thí nghiệm chiến thuật Tic-Tac-Toe</h1>
+                <p class="brand-subline">Trang Game tập trung vào thao tác, giúp bạn chuyển độ khó, phóng to/thu nhỏ, mở rộng bàn và ghi nhận điểm cho tài khoản đang đăng nhập.</p>
+            </div>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html">Giới thiệu</a>
+            <a class="active" href="game.html">Game</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+            <a href="account.html">Tài khoản</a>
+        </nav>
+    </header>
+    <main class="page">
+        <section class="game-section">
+            <div class="game-wrapper">
+                <div class="info-card inline-info">
+                    <p class="eyebrow">Cách chơi</p>
+                    <h3>Điều khiển cơ bản</h3>
+                    <ul>
+                        <li>Chọn độ khó và kích thước bàn trước khi đánh nước đầu.</li>
+                        <li>Bạn là X, AI là O. Hai bên đi lần lượt, AI suy nghĩ lâu hơn ở mức Impossible.</li>
+                        <li>Scoreboard cập nhật ngay sau mỗi ván, không có nút reset điểm.</li>
+                    </ul>
+                </div>
+
+                <header class="header">
+                    <div>
+                        <p class="eyebrow">Trận đấu</p>
+                        <h2>Tic-Tac-Toe Challenge</h2>
+                    </div>
+                    <div class="controls-row">
+                        <label for="difficulty">Độ khó:</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                            <option value="impossible">Impossible</option>
+                        </select>
+                    </div>
+                    <div class="controls-row">
+                        <label for="board-size">Bàn cờ:</label>
+                        <select id="board-size">
+                            <option value="3" selected>3 x 3</option>
+                            <option value="5">5 x 5</option>
+                            <option value="dynamic">Dynamic</option>
+                        </select>
+                    </div>
+                </header>
+
+                <section class="scoreboard">
+                    <div class="score">Bạn: <span id="player-score">0</span></div>
+                    <div class="score">Máy: <span id="ai-score">0</span></div>
+                    <div class="score">Hòa: <span id="draw-score">0</span></div>
+                </section>
+
+                <p id="status" class="status">Lượt của bạn (X)</p>
+
+                <div class="board" id="board"></div>
+
+                <div class="zoom-controls" id="zoom-controls">
+                    <button class="zoom-btn" id="zoom-in">Phóng to</button>
+                    <button class="zoom-btn" id="zoom-out">Thu nhỏ</button>
+                </div>
+
+                <div class="expand-controls" id="expand-controls">
+                    <button class="expand-btn" data-dir="up">+ Hàng trên</button>
+                    <button class="expand-btn" data-dir="down">+ Hàng dưới</button>
+                    <button class="expand-btn" data-dir="left">+ Cột trái</button>
+                    <button class="expand-btn" data-dir="right">+ Cột phải</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="reset-game">Chơi lại</button>
+                </div>
+
+                <div class="info-card highlight inline-info inline-info-bottom">
+                    <p class="eyebrow">Mẹo nhanh</p>
+                    <h3>Tối ưu từng nước đi</h3>
+                    <ul>
+                        <li>Ưu tiên ô giữa ở 3x3, tạo đòn hai hướng ở 5x5.</li>
+                        <li>Khi bàn Dynamic mở rộng, đừng bỏ trống khu vực trung tâm quá lâu.</li>
+                        <li>Thắng 2-3 ván liên tiếp ở một độ khó rồi mới nâng lên mức tiếp theo.</li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="section-block">
+            <p class="eyebrow">Lưu ý</p>
+            <h3>Chơi mượt trên mọi thiết bị</h3>
+            <p class="lede">
+                Đặt điện thoại nằm ngang để có nhiều không gian cho bàn cờ, hoặc chơi trên màn hình lớn để tận dụng hiệu ứng neon. Mọi thao tác chọn ô, zoom, mở rộng đều được tối ưu để không bỏ sót nước đi.
+            </p>
+            <ul>
+                <li>Khi chuyển trang, điểm vẫn giữ nguyên nếu bạn đã đăng nhập.</li>
+                <li>Đổi độ khó giữa các ván để luyện phản xạ, nhưng hãy ghi chú lại cảm giác ở mỗi mức.</li>
+                <li>Nếu muốn thử nghiệm mà không ảnh hưởng điểm, hãy đăng xuất ở trang Tài khoản.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>
+            <strong>AI Tic-Tac-Toe</strong>
+            <p>Trang Game tập trung giúp bạn ra nước đi nhanh, quan sát bàn cờ và ghi điểm trực tiếp. Sau khi kết thúc ván, hãy chuyển sang Bảng xếp hạng để xem thứ hạng và quay lại luyện tập.</p>
+            <p>Đăng nhập ở trang Tài khoản trước khi chơi để bảo toàn toàn bộ điểm thắng/thua/hòa.</p>
+        </div>
+        <div class="footer-links">
+            <a href="game.html">Game</a>
+            <a href="index.html">Giới thiệu</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+            <a href="account.html">Tài khoản</a>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

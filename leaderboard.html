@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tic-Tac-Toe - Bảng xếp hạng</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-mark" style="padding: 0; background: none; box-shadow: none;">
+                <img src="icon.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
+            </div>
+            <div>
+                <p class="brand-kicker">AI Tic-Tac-Toe Lab</p>
+                <h1 class="site-title">Phòng thí nghiệm chiến thuật Tic-Tac-Toe</h1>
+                <p class="brand-subline">Trang Bảng xếp hạng hiển thị toàn bộ thành tích được lưu trên thiết bị, ưu tiên số ván thắng, sau đó hòa và cuối cùng là số ván thua.</p>
+            </div>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html">Giới thiệu</a>
+            <a href="game.html">Game</a>
+            <a class="active" href="leaderboard.html">Bảng xếp hạng</a>
+            <a href="account.html">Tài khoản</a>
+        </nav>
+    </header>
+    <main class="page">
+        <section class="leaderboard-section" id="leaderboard">
+            <div class="leaderboard-head">
+                <div>
+                    <p class="eyebrow">Bảng xếp hạng</p>
+                    <h3>Xếp hạng người chơi theo điểm thắng</h3>
+                    <p class="lede">Đăng nhập, chơi và xem bạn ở đâu trên bảng. Điểm được lưu bằng local storage, không cần mạng.</p>
+                </div>
+                <div class="pill-note subtle">Sắp xếp theo: Thắng > Hòa > Thua ít > Lần cập nhật gần nhất.</div>
+            </div>
+            <div class="leaderboard-card">
+                <div class="leaderboard-table">
+                    <div class="leaderboard-row header">
+                        <span>#</span>
+                        <span>Người chơi</span>
+                        <span>Thắng</span>
+                        <span>Hòa</span>
+                        <span>Thua</span>
+                        <span>Tổng</span>
+                    </div>
+                    <div id="leaderboard-body"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-grid">
+            <div class="info-card">
+                <p class="eyebrow">Quy tắc xếp hạng</p>
+                <h3>Tính điểm rõ ràng</h3>
+                <ul>
+                    <li>Thắng nhiều hơn sẽ đẩy bạn lên cao nhất.</li>
+                    <li>Số hòa dùng để phân hạng khi số thắng bằng nhau.</li>
+                    <li>Thua ít hơn sẽ giúp bạn vượt lên khi thắng/hòa ngang nhau.</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <p class="eyebrow">Khi nào cập nhật</p>
+                <h3>Tự động sau mỗi ván</h3>
+                <ul>
+                    <li>Vừa kết thúc ván ở trang Game, bảng này tự động làm mới.</li>
+                    <li>Đăng nhập ở trang Tài khoản để gắn điểm với tên bạn.</li>
+                    <li>Nếu chưa có tài khoản, chơi ở chế độ khách sẽ không hiện lên bảng.</li>
+                </ul>
+            </div>
+            <div class="info-card highlight">
+                <p class="eyebrow">Mục tiêu</p>
+                <h3>Leo hạng ổn định</h3>
+                <ul>
+                    <li>Giữ tỉ lệ thua thấp bằng cách xuống độ khó nếu cần.</li>
+                    <li>Ưu tiên chuỗi thắng ngắn, đều đặn thay vì liều lĩnh ở mức Impossible ngay.</li>
+                    <li>Theo dõi tiến trình hằng ngày để thấy rõ sự cải thiện.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>
+            <strong>AI Tic-Tac-Toe</strong>
+            <p>Trang Bảng xếp hạng giúp bạn đo lường tiến bộ sau mỗi ván. Hãy quay lại trang Game để tiếp tục leo hạng và sang trang Tài khoản để đảm bảo đang ở đúng phiên.</p>
+            <p>Điểm số được lưu tại chỗ, luôn sẵn sàng mỗi khi bạn mở lại trò chơi.</p>
+        </div>
+        <div class="footer-links">
+            <a href="game.html">Game</a>
+            <a href="index.html">Giới thiệu</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+            <a href="account.html">Tài khoản</a>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

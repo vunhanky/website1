@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tic-Tac-Toe - Tài khoản</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-mark" style="padding: 0; background: none; box-shadow: none;">
+                <img src="icon.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
+            </div>
+            <div>
+                <p class="brand-kicker">AI Tic-Tac-Toe Lab</p>
+                <h1 class="site-title">Phòng thí nghiệm chiến thuật Tic-Tac-Toe</h1>
+                <p class="brand-subline">Trang Tài khoản giúp bạn đăng ký, đăng nhập và kiểm tra trạng thái phiên để điểm luôn được lưu đúng tên.</p>
+            </div>
+        </div>
+        <nav class="site-nav">
+            <a href="index.html">Giới thiệu</a>
+            <a href="game.html">Game</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+            <a class="active" href="account.html">Tài khoản</a>
+        </nav>
+    </header>
+    <main class="page">
+        <section class="auth-section" id="tai-khoan">
+            <div class="auth-copy">
+                <p class="eyebrow">Quản lý phiên</p>
+                <h3>Lưu điểm theo tên bạn</h3>
+                <p class="lede">
+                    Đăng ký và đăng nhập để giữ điểm thắng/thua/hòa. Mỗi lần hoàn thành ván đấu đều được lưu lại và hiển thị trong bảng xếp hạng ở trang riêng.
+                </p>
+                <div class="pill-note">Mỗi thiết bị là một kho dữ liệu cục bộ. Đăng nhập lại để tiếp tục từ nơi bạn dừng.</div>
+            </div>
+            <div class="auth-forms">
+                <div class="auth-card">
+                    <h4>Đăng nhập</h4>
+                    <form id="login-form" class="form-grid">
+                        <label>
+                            <span>Tên người chơi</span>
+                            <input type="text" id="login-username" autocomplete="username">
+                        </label>
+                        <label>
+                            <span>Mật khẩu</span>
+                            <input type="password" id="login-password" autocomplete="current-password">
+                        </label>
+                        <button type="submit" class="btn primary">Đăng nhập</button>
+                    </form>
+                </div>
+                <div class="auth-card">
+                    <h4>Đăng ký</h4>
+                    <form id="register-form" class="form-grid">
+                        <label>
+                            <span>Tên người chơi</span>
+                            <input type="text" id="register-username" autocomplete="username">
+                        </label>
+                        <label>
+                            <span>Mật khẩu</span>
+                            <input type="password" id="register-password" autocomplete="new-password">
+                        </label>
+                        <button type="submit" class="btn ghost">Tạo tài khoản</button>
+                    </form>
+                </div>
+                <div class="auth-card full">
+                    <div class="session-row">
+                        <div>
+                            <p class="eyebrow">Trạng thái</p>
+                            <h4 id="session-status">Đang ở chế độ khách</h4>
+                            <p class="session-note" id="session-note">Đăng nhập để lưu điểm và xếp hạng.</p>
+                        </div>
+                        <div class="session-actions">
+                            <p class="pill-note subtle">Người chơi: <span id="session-username">-</span></p>
+                            <button id="logout-btn" type="button" class="btn danger" disabled>Đăng xuất</button>
+                        </div>
+                    </div>
+                    <div class="session-stats">
+                        <div class="stat-chip">Thắng: <span id="stat-win">0</span></div>
+                        <div class="stat-chip">Thua: <span id="stat-loss">0</span></div>
+                        <div class="stat-chip">Hòa: <span id="stat-draw">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-grid">
+            <div class="info-card">
+                <p class="eyebrow">Quy trình</p>
+                <h3>3 bước lưu điểm</h3>
+                <ul>
+                    <li>Đăng ký tên người chơi duy nhất trên thiết bị.</li>
+                    <li>Đăng nhập trước khi vào trang Game để đồng bộ điểm.</li>
+                    <li>Kết thúc ván, điểm tự tăng và hiển thị trên bảng xếp hạng.</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <p class="eyebrow">Đổi phiên</p>
+                <h3>Chuyển tài khoản</h3>
+                <ul>
+                    <li>Đăng xuất để thử chiến thuật mới ở chế độ khách.</li>
+                    <li>Đăng nhập lại tài khoản chính để tiếp tục tích lũy điểm.</li>
+                    <li>Mỗi tài khoản giữ điểm riêng, không ảnh hưởng lẫn nhau.</li>
+                </ul>
+            </div>
+            <div class="info-card highlight">
+                <p class="eyebrow">An toàn dữ liệu</p>
+                <h3>Không gửi ra ngoài</h3>
+                <ul>
+                    <li>Dữ liệu chỉ lưu trong Local Storage của trình duyệt.</li>
+                    <li>Không cần email hay số điện thoại, chỉ tên và mật khẩu.</li>
+                    <li>Sao lưu bằng cách giữ trình duyệt hoặc thiết bị hiện tại.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>
+            <strong>AI Tic-Tac-Toe</strong>
+            <p>Trang Tài khoản giúp bạn kiểm soát phiên đăng nhập và bảo toàn điểm số. Khi đã sẵn sàng, hãy vào trang Game để thi đấu và mở Bảng xếp hạng để xem thứ hạng hiện tại.</p>
+            <p>Mỗi tài khoản là một câu chuyện luyện tập riêng. Hãy giữ tài khoản của bạn và quay lại thường xuyên.</p>
+        </div>
+        <div class="footer-links">
+            <a href="game.html">Game</a>
+            <a href="index.html">Giới thiệu</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+            <a href="account.html">Tài khoản</a>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

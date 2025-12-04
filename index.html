@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe - AI Challenge</title>
+    <title>AI Tic-Tac-Toe - Giới thiệu</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,210 +15,109 @@
             </div>
             <div>
                 <p class="brand-kicker">AI Tic-Tac-Toe Lab</p>
-                <h1 class="site-title">Phòng thí nghiệm chiến thuật</h1>
+                <h1 class="site-title">Phòng thí nghiệm chiến thuật Tic-Tac-Toe</h1>
+                <p class="brand-subline">Giao diện neon, AI nhiều cấp độ và luồng 4 trang tách biệt để bạn đọc, chơi, theo dõi xếp hạng và quản lý tài khoản rõ ràng.</p>
             </div>
         </div>
         <nav class="site-nav">
-            <a href="#gioi-thieu">Giới thiệu</a>
-            <a href="#game">Game</a>
-            <a href="#tai-khoan">Tài khoản</a>
-            <a href="#leaderboard">Bảng xếp hạng</a>
+            <a class="active" href="index.html">Giới thiệu</a>
+            <a href="game.html">Game</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+            <a href="account.html">Tài khoản</a>
         </nav>
     </header>
 
     <main class="page">
-        <section class="hero" id="gioi-thieu">
-            <div class="hero-copy">
-                <p class="eyebrow">AI vs Player</p>
-                <h2>Chinh phục bàn cờ neon với AI linh hoạt</h2>
-                <p class="lede">
-                    Đổi kích thước bảng, zoom, mở rộng dòng/cột và lựa chọn 4 mức độ AI. Mỗi lần chơi đều có điểm số theo dõi trực tiếp.
-                </p>
-                <div class="hero-tags">
-                    <span class="tag-pill">4 cấp độ AI</span>
-                    <span class="tag-pill">Bảng 3x3, 5x5, Dynamic</span>
-                    <span class="tag-pill">Theo dõi điểm thắng/thua/hòa</span>
-                </div>
-                <div class="hero-actions">
-                    <a class="btn primary" href="#game">Chơi ngay</a>
-                    <a class="btn ghost" href="#meo">Mẹo và hướng dẫn</a>
-                </div>
-            </div>
-            <div class="hero-panel">
-                <div class="mini-card">
-                    <p class="label">Trải nghiệm</p>
-                    <strong>Hiệu ứng neon</strong>
-                    <small>Board tương tác với zoom, mở rộng linh hoạt.</small>
-                </div>
-                <div class="mini-card">
-                    <p class="label">Chiến thuật</p>
-                    <strong>AI Minimax</strong>
-                    <small>Chọn độ khó để tập luyện và thử thách bản thân.</small>
-                </div>
-            </div>
+        <section class="section-block" id="gioi-thieu">
+            <p class="eyebrow">Giới thiệu</p>
+            <h3>Bản thử nghiệm chiến thuật dành cho người thích mày mò</h3>
+            <p class="lede">
+                AI Tic-Tac-Toe được thiết kế như một phòng thí nghiệm nhỏ: bạn thay đổi kích thước bàn, di chuyển giữa 4 trang chức năng và quan sát cách AI phản ứng. Mọi thao tác đều mượt mà, lưu lại đầy đủ để bạn xem lại tiến trình.
+            </p>
+            <p>
+                Điểm đáng chú ý là luồng tách thành từng trang: trang giới thiệu này giúp bạn nắm triết lý thiết kế; trang game tập trung tối đa cho thao tác chơi; trang bảng xếp hạng hiển thị điểm cộng đồng trên thiết bị; trang tài khoản giúp đăng ký/đăng nhập, giữ điểm liên tục.
+            </p>
+            <ul>
+                <li>Chuyển trang nhanh qua header hoặc footer, không cần cuộn dài trên một trang.</li>
+                <li>Toàn bộ dữ liệu lưu trong trình duyệt, không cần máy chủ, vẫn có cảm giác hồ sơ cá nhân.</li>
+                <li>Phần mô tả và hướng dẫn được viết dài hơn để bạn hiểu rõ từng tính năng trước khi bắt đầu.</li>
+            </ul>
         </section>
 
-        <section class="auth-section" id="tai-khoan">
-            <div class="auth-copy">
-                <p class="eyebrow">Tài khoản</p>
-                <h3>Lưu điểm theo tên bạn</h3>
-                <p class="lede">
-                    Đăng ký và đăng nhập để giữ điểm thắng/thua/hòa. Mỗi lần hoàn thành ván đấu đều được lưu lại và hiển thị trong bảng xếp hạng.
-                </p>
-                <div class="pill-note">Không có reset điểm - mỗi chiến thắng đều được ghi nhận.</div>
-            </div>
-            <div class="auth-forms">
-                <div class="auth-card">
-                    <h4>Đăng nhập</h4>
-                    <form id="login-form" class="form-grid">
-                        <label>
-                            <span>Tên người chơi</span>
-                            <input type="text" id="login-username" autocomplete="username">
-                        </label>
-                        <label>
-                            <span>Mật khẩu</span>
-                            <input type="password" id="login-password" autocomplete="current-password">
-                        </label>
-                        <button type="submit" class="btn primary">Đăng nhập</button>
-                    </form>
-                </div>
-                <div class="auth-card">
-                    <h4>Đăng ký</h4>
-                    <form id="register-form" class="form-grid">
-                        <label>
-                            <span>Tên người chơi</span>
-                            <input type="text" id="register-username" autocomplete="username">
-                        </label>
-                        <label>
-                            <span>Mật khẩu</span>
-                            <input type="password" id="register-password" autocomplete="new-password">
-                        </label>
-                        <button type="submit" class="btn ghost">Tạo tài khoản</button>
-                    </form>
-                </div>
-                <div class="auth-card full">
-                    <div class="session-row">
-                        <div>
-                            <p class="eyebrow">Trạng thái</p>
-                            <h4 id="session-status">Đang ở chế độ khách</h4>
-                            <p class="session-note" id="session-note">Đăng nhập để lưu điểm và xếp hạng.</p>
-                        </div>
-                        <div class="session-actions">
-                            <p class="pill-note subtle">Người chơi: <span id="session-username">-</span></p>
-                            <button id="logout-btn" type="button" class="btn danger" disabled>Đăng xuất</button>
-                        </div>
-                    </div>
-                    <div class="session-stats">
-                        <div class="stat-chip">Thắng: <span id="stat-win">0</span></div>
-                        <div class="stat-chip">Thua: <span id="stat-loss">0</span></div>
-                        <div class="stat-chip">Hòa: <span id="stat-draw">0</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="game-section" id="game">
-            <div class="game-wrapper">
-                <header class="header">
-                    <h2>Tic-Tac-Toe Challenge</h2>
-                    <div class="controls-row">
-                        <label for="difficulty">Difficulty:</label>
-                        <select id="difficulty">
-                            <option value="easy">Easy</option>
-                            <option value="medium">Medium</option>
-                            <option value="hard">Hard</option>
-                            <option value="impossible">Impossible</option>
-                        </select>
-                    </div>
-                    <div class="controls-row">
-                        <label for="board-size">Board:</label>
-                        <select id="board-size">
-                            <option value="3" selected>3 x 3</option>
-                            <option value="5">5 x 5</option>
-                            <option value="dynamic">Dynamic</option>
-                        </select>
-                    </div>
-                </header>
-
-                <section class="scoreboard">
-                    <div class="score">Bạn: <span id="player-score">0</span></div>
-                    <div class="score">Máy: <span id="ai-score">0</span></div>
-                    <div class="score">Hòa: <span id="draw-score">0</span></div>
-                </section>
-
-                <p id="status" class="status">Lượt của bạn (X)</p>
-
-                <div class="board" id="board"></div>
-
-                <div class="zoom-controls" id="zoom-controls">
-                    <button class="zoom-btn" id="zoom-in">Zoom +</button>
-                    <button class="zoom-btn" id="zoom-out">Zoom -</button>
-                </div>
-
-                <div class="expand-controls" id="expand-controls">
-                    <button class="expand-btn" data-dir="up">+ Row Up</button>
-                    <button class="expand-btn" data-dir="down">+ Row Down</button>
-                    <button class="expand-btn" data-dir="left">+ Col Left</button>
-                    <button class="expand-btn" data-dir="right">+ Col Right</button>
-                </div>
-
-                <div class="action-buttons">
-                    <button id="reset-game">Chơi lại</button>
-                </div>
-            </div>
-        </section>
-
-        <section class="info-grid" id="meo">
+        <section class="info-grid">
             <div class="info-card">
-                <p class="eyebrow">Cách chơi</p>
-                <h3>Bắt đầu nhanh</h3>
+                <p class="eyebrow">Luồng trải nghiệm</p>
+                <h3>Tách thành 4 trang riêng</h3>
                 <ul>
-                    <li>Chọn độ khó và kích thước bảng trước khi bắt đầu.</li>
-                    <li>Bạn là X, AI là O. Lượt đánh luân phiên.</li>
-                    <li>Xem điểm số cập nhật real-time ở phần Scoreboard.</li>
+                    <li>Giới thiệu: đọc bối cảnh, tính năng, mẹo chơi và triết lý thiết kế.</li>
+                    <li>Game: vào bàn cờ, chọn độ khó, phóng to/thu nhỏ, mở rộng ô và chơi ngay.</li>
+                    <li>Bảng xếp hạng: xem thứ hạng dựa trên thắng/hòa/thua được lưu local.</li>
+                    <li>Tài khoản: đăng ký, đăng nhập, xem phiên hiện tại và số liệu cá nhân.</li>
                 </ul>
             </div>
             <div class="info-card">
-                <p class="eyebrow">Bảng động</p>
-                <h3>Tùy biến không giới hạn</h3>
+                <p class="eyebrow">Kiểm soát bàn cờ</p>
+                <h3>Phóng to, thu nhỏ, mở rộng</h3>
                 <ul>
-                    <li>Chế độ Dynamic cho phép thêm dòng/cột bất kỳ lúc nào.</li>
-                    <li>Sử dụng nút Zoom để nhìn rõ các ô ở bảng lớn.</li>
-                    <li>Chỉ có nút Chơi lại, điểm được lưu theo tài khoản.</li>
+                    <li>Zoom 2 chiều trên chế độ Dynamic để nhìn rõ trung tâm khi bàn phình to.</li>
+                    <li>Thêm hàng/cột bằng nút mở rộng khi muốn tạo thế trận dài hơi.</li>
+                    <li>Luật thắng thay đổi theo kích thước: 3 ô liên tiếp cho 3x3, 5 ô cho Dynamic.</li>
                 </ul>
             </div>
             <div class="info-card highlight">
-                <p class="eyebrow">Mẹo thắng</p>
-                <h3>Giữ thế chủ động</h3>
+                <p class="eyebrow">Chuẩn bị</p>
+                <h3>Hướng dẫn đọc nhanh</h3>
                 <ul>
-                    <li>Luôn chiếm giữa bảng 3x3 nếu có thể.</li>
-                    <li>Chặn 2 nước AI liên tiếp trước khi tấn công.</li>
-                    <li>Thử mức độ Impossible để tập suy nghĩ 2-3 nước trước.</li>
+                    <li>Đọc kỹ hướng dẫn dài phía dưới để hiểu cách AI suy nghĩ và cách điểm số được lưu.</li>
+                    <li>Đăng ký tài khoản để giữ điểm, sau đó vào Game để thử độ khó Impossible.</li>
+                    <li>Khi hoàn thành vài ván, mở Bảng xếp hạng để xem mình đang đứng ở đâu.</li>
                 </ul>
             </div>
         </section>
 
-        <section class="leaderboard-section" id="leaderboard">
-            <div class="leaderboard-head">
-                <div>
-                    <p class="eyebrow">Bảng xếp hạng</p>
-                    <h3>Xếp hạng người chơi theo điểm thắng</h3>
-                    <p class="lede">Đăng nhập, chơi, và xem bạn ở đâu trên bảng. Điểm được lưu bằng local storage.</p>
-                </div>
-                <div class="pill-note subtle">Sắp xếp theo điểm thắng > hòa > thua từ thấp.</div>
+        <section class="section-block" id="huong-dan">
+            <p class="eyebrow">Hướng dẫn</p>
+            <h3>Đi từ cơ bản đến nâng cao</h3>
+            <p class="lede">
+                Bạn có thể bắt đầu ở mức dễ, sau đó tăng dần độ khó và kích thước bàn. Toàn bộ quá trình nên diễn ra theo chuỗi hành động rõ ràng để tận dụng hết các trang tách biệt.
+            </p>
+            <ol>
+                <li>Vào trang Tài khoản để đăng ký hoặc đăng nhập, đảm bảo điểm được lưu.</li>
+                <li>Quay lại trang Game, chọn độ khó và kích thước bàn phù hợp với mục tiêu luyện tập.</li>
+                <li>Dùng zoom/mở rộng để kiểm soát tầm nhìn trên bàn Dynamic, ưu tiên giữ trung tâm.</li>
+                <li>Sau mỗi ván, quan sát điểm thắng/thua/hòa; khi thắng liên tục hãy tăng độ khó.</li>
+                <li>Mở trang Bảng xếp hạng để xem thứ hạng và so sánh tiến bộ theo thời gian.</li>
+            </ol>
+            <div class="pill-note subtle">Mẹo: Không có nút reset điểm. Mỗi chiến thắng đều được lưu, giúp bạn thấy rõ hành trình của mình.</div>
+        </section>
+
+        <section class="info-grid">
+            <div class="info-card">
+                <p class="eyebrow">Mẹo trận đấu</p>
+                <h3>Thói quen tốt</h3>
+                <ul>
+                    <li>Điền tên tài khoản trước khi chơi để không bỏ lỡ điểm số.</li>
+                    <li>Luôn xem bảng điều khiển độ khó trước mỗi ván, tránh quên đang ở mức Impossible.</li>
+                    <li>Giữ vị trí trung tâm và tạo đe dọa hai đầu để buộc AI phải phòng thủ.</li>
+                </ul>
             </div>
-            <div class="leaderboard-card">
-                <div class="leaderboard-table">
-                    <div class="leaderboard-row header">
-                        <span>#</span>
-                        <span>Người chơi</span>
-                        <span>Thắng</span>
-                        <span>Hòa</span>
-                        <span>Thua</span>
-                        <span>Tổng</span>
-                    </div>
-                    <div id="leaderboard-body"></div>
-                </div>
+            <div class="info-card">
+                <p class="eyebrow">Hệ thống điểm</p>
+                <h3>Thắng - Hòa - Thua</h3>
+                <ul>
+                    <li>Điểm thắng, hòa, thua đều tăng dần và gắn với tài khoản đang đăng nhập.</li>
+                    <li>Thứ hạng ưu tiên số ván thắng, sau đó hòa, cuối cùng mới xét số ván thua.</li>
+                    <li>Đăng xuất để chơi ở chế độ khách nếu muốn thử nghiệm mà không ảnh hưởng hồ sơ.</li>
+                </ul>
+            </div>
+            <div class="info-card highlight">
+                <p class="eyebrow">Chuẩn bị thiết bị</p>
+                <h3>Chơi thoải mái</h3>
+                <ul>
+                    <li>Game hỗ trợ tốt trên màn hình lớn, nhưng cũng mượt trên mobile nhờ bố cục co giãn.</li>
+                    <li>Dùng tai nghe hoặc bật âm nền riêng để tập trung hơn khi thử mức khó cao.</li>
+                    <li>Lưu trang này vào bookmark để quay lại đọc hướng dẫn bất cứ lúc nào.</li>
+                </ul>
             </div>
         </section>
     </main>
@@ -226,13 +125,14 @@
     <footer class="site-footer">
         <div>
             <strong>AI Tic-Tac-Toe</strong>
-            <p>Giao diện neon, AI nhiều cấp độ và bảng động để bạn thử thách bản thân.</p>
+            <p>Bộ 4 trang tách biệt giúp bạn đọc, chơi, theo dõi bảng xếp hạng và quản lý tài khoản rõ ràng. Mọi điểm số được lưu trên thiết bị, giao diện neon gọn gàng để bạn luyện phản xạ mỗi ngày.</p>
+            <p>Hãy bắt đầu từ trang Game, quay lại Bảng xếp hạng để xem thành quả, và đừng quên duy trì tài khoản để giữ trọn lịch sử thi đấu.</p>
         </div>
         <div class="footer-links">
-            <a href="#game">Chơi ngay</a>
-            <a href="#gioi-thieu">Giới thiệu</a>
-            <a href="#meo">Hướng dẫn</a>
-            <a href="#leaderboard">Bảng xếp hạng</a>
+            <a href="game.html">Game</a>
+            <a href="index.html">Giới thiệu</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+            <a href="account.html">Tài khoản</a>
         </div>
     </footer>
 

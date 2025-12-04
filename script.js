@@ -35,8 +35,9 @@ const DYNAMIC_INITIAL_LAYERS = 1;
 const DYNAMIC_START_SIZE = DYNAMIC_BASE_SIZE + DYNAMIC_INITIAL_LAYERS * 2;
 const DYNAMIC_WIN_LENGTH = 5;
 
-let mode = boardSizeSelect.value === 'dynamic' ? 'dynamic' : 'static';
-let boardRows = mode === 'dynamic' ? DYNAMIC_START_SIZE : Number(boardSizeSelect.value) || DYNAMIC_BASE_SIZE;
+const defaultBoardOption = boardSizeSelect ? boardSizeSelect.value : String(DYNAMIC_BASE_SIZE);
+let mode = defaultBoardOption === 'dynamic' ? 'dynamic' : 'static';
+let boardRows = mode === 'dynamic' ? DYNAMIC_START_SIZE : Number(defaultBoardOption) || DYNAMIC_BASE_SIZE;
 let boardCols = boardRows;
 let winLength = getWinLength();
 let board = createEmptyBoard(boardRows, boardCols);
@@ -44,30 +45,45 @@ let winningCombos = buildWinningCombos(boardRows, boardCols, winLength);
 let isGameActive = true;
 let currentPlayer = 'X';
 const scores = { player: 0, ai: 0, draw: 0 };
-let currentDifficulty = difficultySelect.value || 'easy';
+let currentDifficulty = difficultySelect ? difficultySelect.value : 'easy';
 let cells = [];
 let hiddenLayers = 0;
 let users = loadUsers();
 let currentUser = null;
 
-initGame();
+initApp();
 
-function initGame() {
-    renderBoard();
+function initApp() {
     restoreSession();
-    resetGame();
-
-    difficultySelect.addEventListener('change', handleDifficultyChange);
-    boardSizeSelect.addEventListener('change', handleBoardSizeChange);
-    resetGameBtn.addEventListener('click', () => resetGame({ resetDynamic: mode === 'dynamic', redraw: true }));
     attachAuthHandlers();
 
-    zoomInBtn.addEventListener('click', () => adjustZoom(1));
-    zoomOutBtn.addEventListener('click', () => adjustZoom(-1));
+    if (boardElement) {
+        initGame();
+    } else if (leaderboardBody) {
+        refreshLeaderboard();
+    }
+}
 
-    expandControls.querySelectorAll('.expand-btn').forEach(btn => {
-        btn.addEventListener('click', () => expandBoard(btn.dataset.dir));
-    });
+function initGame() {
+    if (!boardElement) return;
+
+    renderBoard();
+    resetGame();
+
+    if (difficultySelect) difficultySelect.addEventListener('change', handleDifficultyChange);
+    if (boardSizeSelect) boardSizeSelect.addEventListener('change', handleBoardSizeChange);
+    if (resetGameBtn) {
+        resetGameBtn.addEventListener('click', () => resetGame({ resetDynamic: mode === 'dynamic', redraw: true }));
+    }
+
+    if (zoomInBtn) zoomInBtn.addEventListener('click', () => adjustZoom(1));
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => adjustZoom(-1));
+
+    if (expandControls) {
+        expandControls.querySelectorAll('.expand-btn').forEach(btn => {
+            btn.addEventListener('click', () => expandBoard(btn.dataset.dir));
+        });
+    }
 
     toggleExpandControls();
     updateScoreboard();
@@ -84,6 +100,8 @@ function getWinLength() {
 }
 
 function renderBoard() {
+    if (!boardElement) return;
+
     boardElement.innerHTML = '';
     const { offset, visibleRows, visibleCols } = getVisibleBounds();
     boardElement.style.gridTemplateColumns = `repeat(${visibleCols}, 1fr)`;
@@ -429,13 +447,15 @@ function minimax(boardState, depth, isMaximizing) {
 }
 
 function updateStatus(message) {
-    statusText.textContent = message;
+    if (statusText) {
+        statusText.textContent = message;
+    }
 }
 
 function updateScoreboard() {
-    playerScoreEl.textContent = scores.player;
-    aiScoreEl.textContent = scores.ai;
-    drawScoreEl.textContent = scores.draw;
+    if (playerScoreEl) playerScoreEl.textContent = scores.player;
+    if (aiScoreEl) aiScoreEl.textContent = scores.ai;
+    if (drawScoreEl) drawScoreEl.textContent = scores.draw;
     updateSessionStats();
 }
 
@@ -514,7 +534,9 @@ function handleLogin(event) {
 function logoutUser() {
     setCurrentUser(null);
     updateSessionUI('Đã đăng xuất, tiếp tục chơi ở chế độ khách.');
-    resetGame({ resetDynamic: mode === 'dynamic', redraw: true });
+    if (boardElement) {
+        resetGame({ resetDynamic: mode === 'dynamic', redraw: true });
+    }
 }
 
 function restoreSession() {
@@ -707,6 +729,7 @@ function handleBoardSizeChange(event) {
 }
 
 function toggleExpandControls() {
+    if (!expandControls) return;
     expandControls.style.display = 'none';
 }
 
